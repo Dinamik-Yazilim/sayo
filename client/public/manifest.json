@@ -1,0 +1,59 @@
+{
+  "background_color": "#111127",
+  "description": "DinamikSAYO - Satın Alma Yönetim Sistemi",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "DinamikSAYO",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "short_name": "DinamikSAYO",
+  "start_url": "/",
+  "theme_color": "#111127",
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay", "standalone", "fullscreen"],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
+  "icons": [
+    {
+      "src": "img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "img/screenshot01.jpg",
+      "sizes": "600x700",
+      "type": "image/jpg"
+    }
+  ],
+  "id": "/",
+  "lang": "en",
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/pwa/shortcuts/dashboard",
+      "description": "Dashboard"
+    }
+  ],
+  "categories": [
+    "business",
+    "finance",
+    "productivity",
+    "shopping",
+    "social",
+    "travel",
+    "utilities"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 600
+  }
+}
