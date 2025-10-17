@@ -24,6 +24,7 @@ interface MenuItem {
 interface SubMenuItem {
   title: string
   href: string
+  icon?: React.ReactNode
 }
 
 interface Props {
@@ -34,63 +35,62 @@ function menuItems(user: Member) {
   let l = [
     {
       title: 'Gösterge Paneli',
-      icon: <Home className="h-5 w-5" />,
+      icon: <Home className="h-6 w-6" />,
       href: "/",
     },
     {
       title: 'Satın Alma',
-      icon: <TruckIcon className="h-5 w-5" />,
+      icon: <TruckIcon className="h-6 w-6" />,
       submenu: [
-        { title: 'Envanter', href: "/purchase/inventory" },
-        { title: 'Tedarikçiler', href: "/module-closed/vendors" },
-        { title: 'Satın Alma Siparişleri', href: "/purchase/orders" },
-        { title: 'Satın Alma Koşulları', href: "/purchase/conditions" },
+        { title: 'Envanter', href: "/purchase/inventory", icon: <BarChart className="h-5 w-5" /> },
+        { title: 'Tedarikçiler', href: "/module-closed/vendors", icon: <Users className="h-5 w-5" /> },
+        { title: 'Satın Alma Siparişleri', href: "/purchase/orders", icon: <ShoppingCart className="h-5 w-5" /> },
+        { title: 'Satın Alma Koşulları', href: "/purchase/conditions", icon: <FileText className="h-5 w-5" /> },
       ],
     },
     {
       title: 'Raporlar',
-      icon: <ChartAreaIcon className="h-5 w-5" />,
+      icon: <ChartAreaIcon className="h-6 w-6" />,
       submenu: [
-        // { title: 'Satış Karı', href: "/reports/sales-profit" },
-        { title: "Satın Alma Raporu", href: "/reports/purchase" },
-        { title: "Satış Devir Hızı", href: "/module-closed/sales-cycle" },
-        { title: "Satış Raporu", href: "/module-closed/satis-raporu" },
-        { title: "Saatlik Satış Raporu", href: "/module-closed/saatlik-satis-raporu" },
-        { title: "Günlük Ciro", href: "/module-closed/gunluk-ciro" },
-        { title: "Aylık Ciro", href: "/module-closed/aylik-ciro" },
-        { title: "Mağaza Masrafları", href: "/module-closed/magaza-masraflari" },
-        { title: "Envanter", href: "/module-closed/envanter" },
-        { title: "Tedarikçiye Göre Satış Raporu", href: "/module-closed/tedarikciye-gore-satis-raporu" },
-        { title: "Tedarikçiye Göre Sipariş Karşılama", href: "/module-closed/tedarikciye-gore-siparis-karsilama" },
-        { title: "Satın Almaya Göre Satış Raporu", href: "/module-closed/satin-almaya-gore-satis-raporu" },
-        { title: "Nakit Akış", href: "/module-closed/nakit-akis" },
-        { title: "Müşteri Satış Raporu", href: "/module-closed/musteri-satis-raporu" },
-        { title: "Ürün Satış Raporu", href: "/module-closed/urun-satis-raporu" },
-        { title: "Belge Bazlı Ürün Raporu", href: "/module-closed/belge-bazli-urun-raporu" },
-        { title: "İade Nedenleri", href: "/module-closed/iade-nedenleri" },
-        { title: "Fire Raporu", href: "/module-closed/fire-raporu" },
-        { title: "KDV Bazlı Satış Raporu", href: "/module-closed/kdv-bazli-satis-raporu" },
-        { title: "Ürün Stok Durumu", href: "/module-closed/urun-stok-durumu" },
-        { title: "Market Sipariş Raporu", href: "/module-closed/market-siparis-raporu" },
-        { title: "Depo Sipariş Raporu", href: "/module-closed/depo-siparis-raporu" },
-        { title: "Günlük Kasa Defteri", href: "/module-closed/gunluk-kasa-defteri" },
-        { title: "İndirimler Raporu", href: "/module-closed/indirimler-raporu" },
-        { title: "Fiyat Değişim Raporu", href: "/module-closed/fiyat-degisim-raporu" },
-        { title: "Marj Raporu", href: "/module-closed/marj-raporu" },
+        { title: "Satın Alma Raporu", href: "/reports/purchase", icon: <FileText className="h-5 w-5" /> },
+        { title: "Satış Devir Hızı", href: "/module-closed/sales-cycle", icon: <FileText className="h-5 w-5" /> },
+        { title: "Satış Raporu", href: "/module-closed/satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Saatlik Satış Raporu", href: "/module-closed/saatlik-satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Günlük Ciro", href: "/module-closed/gunluk-ciro", icon: <FileText className="h-5 w-5" /> },
+        { title: "Aylık Ciro", href: "/module-closed/aylik-ciro", icon: <FileText className="h-5 w-5" /> },
+        { title: "Mağaza Masrafları", href: "/module-closed/magaza-masraflari", icon: <FileText className="h-5 w-5" /> },
+        { title: "Envanter", href: "/module-closed/envanter", icon: <FileText className="h-5 w-5" /> },
+        { title: "Tedarikçiye Göre Satış Raporu", href: "/module-closed/tedarikciye-gore-satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Tedarikçiye Göre Sipariş Karşılama", href: "/module-closed/tedarikciye-gore-siparis-karsilama", icon: <FileText className="h-5 w-5" /> },
+        { title: "Satın Almaya Göre Satış Raporu", href: "/module-closed/satin-almaya-gore-satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Nakit Akış", href: "/module-closed/nakit-akis", icon: <FileText className="h-5 w-5" /> },
+        { title: "Müşteri Satış Raporu", href: "/module-closed/musteri-satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Ürün Satış Raporu", href: "/module-closed/urun-satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Belge Bazlı Ürün Raporu", href: "/module-closed/belge-bazli-urun-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "İade Nedenleri", href: "/module-closed/iade-nedenleri", icon: <FileText className="h-5 w-5" /> },
+        { title: "Fire Raporu", href: "/module-closed/fire-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "KDV Bazlı Satış Raporu", href: "/module-closed/kdv-bazli-satis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Ürün Stok Durumu", href: "/module-closed/urun-stok-durumu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Market Sipariş Raporu", href: "/module-closed/market-siparis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Depo Sipariş Raporu", href: "/module-closed/depo-siparis-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Günlük Kasa Defteri", href: "/module-closed/gunluk-kasa-defteri", icon: <FileText className="h-5 w-5" /> },
+        { title: "İndirimler Raporu", href: "/module-closed/indirimler-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Fiyat Değişim Raporu", href: "/module-closed/fiyat-degisim-raporu", icon: <FileText className="h-5 w-5" /> },
+        { title: "Marj Raporu", href: "/module-closed/marj-raporu", icon: <FileText className="h-5 w-5" /> },
       ],
     },
     {
       title: 'Bildirimler',
-      icon: <Bell className="h-5 w-5" />,
+      icon: <Bell className="h-6 w-6" />,
       href: "/notifications",
     },
     {
       title: 'Ayarlar',
-      icon: <Settings className="h-5 w-5" />,
+      icon: <Settings className="h-6 w-6" />,
       submenu: [
-        { title: 'Kullanıcılar', href: "/settings/users" },
-        { title: 'Konnektör', href: "/settings/connector" },
-        { title: 'Çalışma Parametreleri', href: "/settings/workingParams" },
+        { title: 'Kullanıcılar', href: "/settings/users", icon: <Users className="h-5 w-5" /> },
+        { title: 'Konnektör', href: "/settings/connector", icon: <ComputerIcon className="h-5 w-5" /> },
+        { title: 'Çalışma Parametreleri', href: "/settings/workingParams", icon: <Settings className="h-5 w-5" /> },
       ],
     },
   ]
@@ -101,19 +101,19 @@ function adminMenu(user: Member) {
   let l = [
     {
       title: 'Gösterge Paneli',
-      icon: <Home className="h-5 w-5" />,
+      icon: <Home className="h-6 w-6" />,
       href: "/",
     },
     {
       title: 'Organizasyonlar',
-      icon: <Building2Icon className="h-5 w-5" />,
+      icon: <Building2Icon className="h-6 w-6" />,
       href: '/admin/organizations'
     }
   ]
   if (user.role == 'sysadmin') {
     l.push({
       title: 'Admin Kullanıcıları',
-      icon: <Users2Icon className="h-5 w-5" />,
+      icon: <Users2Icon className="h-6 w-6" />,
       href: "/admin/adminUsers",
     })
   }
@@ -177,7 +177,7 @@ export function Sidebar({ className }: Props) {
   }, [user])
 
   return (
-    <div className={`w-64 min-h-screen border-r flex flex-col ${className}`}>
+    <div className={`w-72 min-h-screen border-r flex flex-col ${className}`}>
       {user?.organization &&
         <div className="flex justify-between items-center border-b mb-1 bg-gr11een-600 text-green-600 px-2 py-1 font-bold">
           <div className="flex gap-2">
@@ -188,7 +188,7 @@ export function Sidebar({ className }: Props) {
         </div>
       }
       {menu &&
-        <nav className="p-2 mt-0">
+        <nav className="p-2 mt-0 w-full">
           <Accordion type="multiple" value={openAccordions} className="space-y-1">
 
             {menu.map((item, index) => {
@@ -215,10 +215,11 @@ export function Sidebar({ className }: Props) {
                             key={subIndex}
                             href={subItem.href}
                             className={cn(
-                              "px-3 py-2 rounded-md text-sm hover:bg-slate-600 hover:text-white transition-all",
+                              "flex items-center gap-2 px-3 py-2 rounded-md text-sm hover:bg-slate-600 hover:text-white transition-all",
                               isActive(subItem.href) && "bg-amber-700 text-white font-medium",
                             )}
                           >
+                            {subItem.icon}
                             {subItem.title}
                           </Link>
                         ))}

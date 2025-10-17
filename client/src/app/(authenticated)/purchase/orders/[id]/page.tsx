@@ -86,20 +86,20 @@ export default function OrderPage({ params }: Props) {
   const OrderCurrency = () => <span className='text-xs text-muted-foreground'>{orderHeader.currency}</span>
 
   const FormHeader = () => {
-    return (<TsnPanel name="porder_Header" defaultOpen={true} className="mt-4" trigger="Başlık" contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
+    return (<TsnPanel name="porder_Header" collapsible={false} defaultOpen={true} className="mt-4" trigger="Başlık" contentClassName="grid grid-cols-1 lg:grid-cols-6 gap-2 w-full">
       <div className="col-span-1 lg:col-span-6 grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
-        <TsnInput title="Doküman Serisi" defaultValue={orderHeader.docNoSerial}
+        <TsnInput title="Evrak Seri" defaultValue={orderHeader.docNoSerial}
           onBlur={e => setOrderHeader({ ...orderHeader, docNoSerial: e.target.value })}
           disabled={params.id != 'addnew'}
         />
-        <TsnInput type='number' min={0} title="Doküman Sırası" defaultValue={orderHeader.docNoSequence}
+        <TsnInput type='number' min={0} title="Evrak Sıra" defaultValue={orderHeader.docNoSequence}
           disabled
         />
         <TsnInput type='date' title="Tarih" defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, issueDate: e.target.value })} />
-        <TsnInput title="Doküman Numarası" defaultValue={orderHeader.documentNumber}
+        <TsnInput title="Belge No" defaultValue={orderHeader.documentNumber}
           onBlur={e => setOrderHeader({ ...orderHeader, documentNumber: e.target.value })} />
-        <TsnInput type='date' title="Doküman Tarihi" defaultValue={orderHeader.issueDate?.substring(0, 10)}
+        <TsnInput type='date' title="Belge Tarihi" defaultValue={orderHeader.issueDate?.substring(0, 10)}
           onBlur={e => setOrderHeader({ ...orderHeader, documentDate: e.target.value })} />
       </div>
       <div className="col-span-4 lg:col-span-4 w-full p-2 pe-4 flex items-start justify-between  border rounded-md border-dashed">
@@ -161,7 +161,7 @@ export default function OrderPage({ params }: Props) {
   }
 
   const FormDetail = () => {
-    return (<TsnPanel name="porder_Detail" defaultOpen={true} className="mt-4" trigger="Satırlar" contentClassName="relative grid grid-cols-1gap-2 w-full">
+    return (<TsnPanel name="porder_Detail" collapsible={false} defaultOpen={true} className="mt-4" trigger="Satırlar" contentClassName="relative grid grid-cols-1gap-2 w-full">
       <TsnLineGrid
         list={orderDetails}
         onHeaderPaint={() =>
@@ -240,7 +240,7 @@ export default function OrderPage({ params }: Props) {
   }
 
   const FormFooter = () => {
-    return (<TsnPanel name="porder_Footer" defaultOpen={true} className="mt-4" trigger="Toplamlar" contentClassName="grid grid-cols-1 lg:grid-cols-4 gap-2 w-full">
+    return (<TsnPanel name="porder_Footer" collapsible={false} defaultOpen={true} className="mt-4" trigger="Toplamlar" contentClassName="grid grid-cols-1 lg:grid-cols-4 gap-2 w-full">
       <div className="flex flex-col gap-2">
         <div className="grid grid-cols-2">
           <div>Satır Toplamı</div>

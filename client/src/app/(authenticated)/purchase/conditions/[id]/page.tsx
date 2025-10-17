@@ -77,7 +77,7 @@ export default function PurchaseConditionPage({ params }: Props) {
   const save = () => {
     savePurchaseCondition(token, pcHeader, pcDetails)
       .then(() => {
-        toast({ title: `🙂 Başarılı`, description: 'Doküman başarıyla kaydedildi', duration: 800 })
+        toast({ title: `🙂 Başarılı`, description: 'Belge başarıyla kaydedildi', duration: 800 })
         setTimeout(() => router.back(), 1000)
       })
       .catch(err => toast({ title: 'Hata', description: err || '', variant: 'destructive' }))
@@ -89,18 +89,18 @@ export default function PurchaseConditionPage({ params }: Props) {
   const FormHeader = () => {
     return (<TsnPanel name="pcondition_Header" defaultOpen={true} className="mt-4" trigger="Başlık" contentClassName="flex flex-col gap-2 w-full">
       <div className="grid grid-cols-1 lg:grid-cols-5 w-full items-center gap-2">
-        <TsnInput title="Doküman Serisi" defaultValue={pcHeader.docNoSerial}
+        <TsnInput title="Evrak Seri" defaultValue={pcHeader.docNoSerial}
           onBlur={e => setPCHeader({ ...pcHeader, docNoSerial: e.target.value })}
           disabled={params.id != 'addnew'}
         />
-        <TsnInput type='number' min={0} title="Doküman Sırası" defaultValue={pcHeader.docNoSequence}
+        <TsnInput type='number' min={0} title="Evrak Sıra" defaultValue={pcHeader.docNoSequence}
           disabled
         />
         <TsnInput type='date' title="Tarih" defaultValue={pcHeader.issueDate?.substring(0, 10)}
           onBlur={e => setPCHeader({ ...pcHeader, issueDate: e.target.value })} />
-        <TsnInput title="Doküman Numarası" defaultValue={pcHeader.documentNumber}
+        <TsnInput title="Belge No" defaultValue={pcHeader.documentNumber}
           onBlur={e => setPCHeader({ ...pcHeader, documentNumber: e.target.value })} />
-        <TsnInput type='date' title="Doküman Tarihi" defaultValue={pcHeader.issueDate?.substring(0, 10)}
+        <TsnInput type='date' title="Belge Tarihi" defaultValue={pcHeader.issueDate?.substring(0, 10)}
           onBlur={e => setPCHeader({ ...pcHeader, documentDate: e.target.value })} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">

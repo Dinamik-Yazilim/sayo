@@ -85,7 +85,7 @@ export default function SettingsPage({ }: Props) {
             title='Organizasyona bağlanmak istiyor musunuz?'
             description={<>{e.name}</>}
           >
-            <div className='flex gap-2 w-full px-2 py-2 rounded-md bg-green-800 text-white hover:bg-green-500 hover:text-white'>
+            <div className='flex gap-2 w-full px-2 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500 hover:text-white'>
               <Plug2Icon size={'16px'} />
               {e.name}
             </div>
