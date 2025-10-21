@@ -25,15 +25,17 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-slate-900">Sayo</h1>
-              <Badge variant="secondary" className="ml-3">Beta</Badge>
+              <h1 className="text-2xl font-bold text-slate-900">DinamikSAYO</h1>
+              <Badge variant="secondary" className="ml-3">V17</Badge>
             </div>
             <nav className="hidden md:flex space-x-8">
               <a href="#features" className="text-slate-600 hover:text-slate-900">Özellikler</a>
               <a href="#pricing" className="text-slate-600 hover:text-slate-900">Fiyatlandırma</a>
               <a href="#contact" className="text-slate-600 hover:text-slate-900">İletişim</a>
             </nav>
-            <Button>Ücretsiz Deneyin</Button>
+            <Button asChild>
+              <a href="https://sayoapp.dinamikup.com" target="_blank" rel="noopener noreferrer">Sisteme Giriş</a>
+            </Button>
           </div>
         </div>
       </header>
@@ -42,19 +44,19 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-slate-900 mb-6">
-            İşletmenizi Dijital Dönüşümle
-            <span className="text-blue-600"> Güçlendirin</span>
+            Mikro ERP ile Entegre
+            <span className="text-blue-600"> Satın Alma Yönetimi</span>
           </h1>
           <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-            Sayo ile satın alma, envanter yönetimi, raporlama ve daha fazlasını tek platformda yönetin.
-            Modern, hızlı ve kullanıcı dostu ERP çözümü.
+            DinamikSAYO, Mikro ERP V16 ve V17 sürümleri ile tam entegre çalışan profesyonel satın alma yönetim sistemidir.
+            Dinamik Yazılım güvencesi ile işletmenizi geleceğe taşıyın.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="text-lg px-8 py-3">
-              Hemen Başlayın
+              Demo Talep Et
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              Demo İzleyin
+              Dinamik Yazılım'ı Ziyaret Et
             </Button>
           </div>
         </div>
@@ -65,10 +67,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Güçlü Özellikler
+              DinamikSAYO Özellikleri
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              İşletmenizin ihtiyacı olan her şey tek platformda
+              Mikro ERP entegrasyonu ile Dinamik Yazılım kalitesinde çözümler
             </p>
           </div>
 
@@ -78,9 +80,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <Package className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle>Envanter Yönetimi</CardTitle>
+                <CardTitle>Mikro ERP Entegrasyonu</CardTitle>
                 <CardDescription>
-                  Gerçek zamanlı stok takibi ve otomatik uyarılar ile envanter kontrolünü kolaylaştırın
+                  V16 ve V17 sürümleri ile tam entegre çalışan sistem. Dinamik Yazılım kalitesi garantisi.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -90,9 +92,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                   <ShoppingCart className="w-6 h-6 text-green-600" />
                 </div>
-                <CardTitle>Satın Alma</CardTitle>
+                <CardTitle>Satın Alma Yönetimi</CardTitle>
                 <CardDescription>
-                  Tedarikçi yönetimi, sipariş takibi ve satın alma süreçlerini optimize edin
+                  Tedarikçi yönetimi, sipariş takibi ve satın alma süreçlerini DinamikSAYO ile optimize edin
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -153,10 +155,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Neden Sayo?
+              Neden DinamikSAYO?
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Modern teknoloji ile geleneksel iş süreçlerini birleştiren çözümümüz
+              Dinamik Yazılım Ltd. Şti. güvencesi ile Mikro ERP entegreli çözüm
             </p>
           </div>
 
@@ -211,11 +213,11 @@ export default function Home() {
                   <Star className="w-8 h-8 text-blue-600" />
                 </div>
                 <blockquote className="text-lg text-slate-600 mb-6">
-                  "Sayo ile işletme süreçlerimizi tamamen dijitalleştirdik. Verimlilik %40 arttı!"
+                  "DinamikSAYO ile Mikro ERP entegrasyonu sayesinde satın alma süreçlerimiz %60 hızlandı!"
                 </blockquote>
                 <div className="text-sm">
-                  <p className="font-semibold text-slate-900">Ahmet Yılmaz</p>
-                  <p className="text-slate-500">CEO, ABC Ltd.</p>
+                  <p className="font-semibold text-slate-900">Mehmet Kaya</p>
+                  <p className="text-slate-500">İşletme Müdürü, Örnek Şirketi A.Ş.</p>
                 </div>
               </div>
             </div>
@@ -228,10 +230,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Basit Fiyatlandırma
+              DinamikSAYO Fiyatlandırma
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              İhtiyacınıza uygun planı seçin, istediğiniz zaman değiştirin
+              Dinamik Yazılım özel fiyatlandırması - Mikro ERP entegrasyonu dahil
             </p>
           </div>
 
@@ -241,7 +243,7 @@ export default function Home() {
                 <CardTitle className="text-2xl">Başlangıç</CardTitle>
                 <CardDescription>Küçük işletmeler için</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">₺299</span>
+                  <span className="text-4xl font-bold">₺0,00</span>
                   <span className="text-slate-500">/ay</span>
                 </div>
               </CardHeader>
@@ -272,7 +274,7 @@ export default function Home() {
                 <CardTitle className="text-2xl">Profesyonel</CardTitle>
                 <CardDescription>Büyüyen işletmeler için</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">₺599</span>
+                  <span className="text-4xl font-bold">₺0,00</span>
                   <span className="text-slate-500">/ay</span>
                 </div>
               </CardHeader>
@@ -304,7 +306,7 @@ export default function Home() {
                 <CardTitle className="text-2xl">Kurumsal</CardTitle>
                 <CardDescription>Büyük organizasyonlar için</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">₺999</span>
+                  <span className="text-4xl font-bold">₺0,00</span>
                   <span className="text-slate-500">/ay</span>
                 </div>
               </CardHeader>
@@ -338,13 +340,13 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-blue-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Hemen Başlamaya Hazır mısınız?
+            DinamikSAYO'ya Hazır mısınız?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            14 gün ücretsiz deneme. Kredi kartı gerekmez.
+            Dinamik Yazılım güvencesi ile Mikro ERP entegre çözümü keşfedin.
           </p>
           <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
-            Ücretsiz Denemeyi Başlat
+            Demo Talep Edin
           </Button>
         </div>
       </section>
@@ -354,9 +356,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Sayo</h3>
+              <h3 className="text-lg font-semibold mb-4">DinamikSAYO</h3>
               <p className="text-slate-400">
-                Modern ERP çözümü ile işletmenizi geleceğe taşıyın.
+                Dinamik Yazılım Ltd. Şti. ile Mikro ERP entegre satın alma yönetim sistemi.
               </p>
             </div>
             <div>
@@ -386,7 +388,7 @@ export default function Home() {
           </div>
           <Separator className="my-8 bg-slate-700" />
           <div className="text-center text-slate-400">
-            <p>&copy; 2025 Sayo. Tüm hakları saklıdır.</p>
+            <p>&copy; 2025 Dinamik Yazılım Ltd. Şti. Tüm hakları saklıdır.</p>
           </div>
         </div>
       </footer>
