@@ -9,7 +9,6 @@ import {
   Users,
   CheckCircle,
   Shield,
-  Clock,
   TrendingUp,
   Smartphone,
   Cloud,
@@ -56,7 +55,7 @@ export default function Home() {
               Demo Talep Et
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              Dinamik Yazılım'ı Ziyaret Et
+              Dinamik Yazılım&apos;ı Ziyaret Et
             </Button>
           </div>
         </div>
@@ -213,7 +212,7 @@ export default function Home() {
                   <Star className="w-8 h-8 text-blue-600" />
                 </div>
                 <blockquote className="text-lg text-slate-600 mb-6">
-                  "DinamikSAYO ile Mikro ERP entegrasyonu sayesinde satın alma süreçlerimiz %60 hızlandı!"
+                  &ldquo;DinamikSAYO ile Mikro ERP entegrasyonu sayesinde satın alma süreçlerimiz %60 hızlandı!&rdquo;
                 </blockquote>
                 <div className="text-sm">
                   <p className="font-semibold text-slate-900">Mehmet Kaya</p>
@@ -340,7 +339,7 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-blue-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            DinamikSAYO'ya Hazır mısınız?
+            DinamikSAYO&apos;ya Hazır mısınız?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
             Dinamik Yazılım güvencesi ile Mikro ERP entegre çözümü keşfedin.
