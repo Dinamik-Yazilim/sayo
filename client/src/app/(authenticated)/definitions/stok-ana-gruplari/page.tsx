@@ -90,7 +90,7 @@ export default function load() {
         <CardHeader>
           <CardTitle>Stok Ana Grupları</CardTitle>
           <CardDescription>
-            MikroERP Stok Ana Grupları Listesi ({gruplar.length} kayıt)
+            Stok Ana Grupları Listesi ({gruplar.length} kayıt)
           </CardDescription>
         </CardHeader>
         <CardContent>

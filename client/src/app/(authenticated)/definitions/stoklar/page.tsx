@@ -84,9 +84,8 @@ export default function StoklarPage() {
       const anaGrupData = await postItem('/mikro/get', token, { query: getStokAnaGruplari() })
       setAnaGruplar(anaGrupData || [])
 
-      // Alt Gruplar
-      const altGrupData = await postItem('/mikro/get', token, { query: getStokAltGruplari() })
-      setAltGruplar(altGrupData || [])
+      // Alt Gruplar - başlangıçta yükleme, ana grup seçilince yüklenecek
+      setAltGruplar([])
 
       // Kategoriler
       const kategoriData = await postItem('/mikro/get', token, { query: getStokKategorileri() })
@@ -97,6 +96,23 @@ export default function StoklarPage() {
       setMarkalar(markaData || [])
     } catch (err) {
       console.error('Filtreler yüklenirken hata:', err)
+    }
+  }
+
+  const loadAltGruplar = async (anaGrupKod: string) => {
+    try {
+      if (anaGrupKod === 'all') {
+        // Ana grup seçilmemişse alt grupları temizle
+        setAltGruplar([])
+        return
+      }
+
+      const query = getStokAltGruplari(anaGrupKod)
+      const altGrupData = await postItem('/mikro/get', token, { query })
+      setAltGruplar(altGrupData || [])
+    } catch (err) {
+      console.error('Alt gruplar yüklenirken hata:', err)
+      setAltGruplar([])
     }
   }
 
@@ -149,6 +165,14 @@ export default function StoklarPage() {
     }
   }, [token])
 
+  // Ana grup değiştiğinde alt grupları yükle ve alt grup seçimini sıfırla
+  useEffect(() => {
+    if (token && anaGruplar.length > 0) {
+      loadAltGruplar(selectedAnaGrup)
+      setSelectedAltGrup('all')
+    }
+  }, [selectedAnaGrup])
+
   // searchTerm temizlendiğinde otomatik listele
   useEffect(() => {
     if (token && searchTerm === '' && lastSearchTerm !== '') {
@@ -193,7 +217,7 @@ export default function StoklarPage() {
             Stok Kartları
           </CardTitle>
           <CardDescription>
-            MikroERP Stok Kartları Listesi ({stoklar.length} kayıt)
+            Stok Kartları Listesi ({stoklar.length} kayıt)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -219,7 +243,9 @@ export default function StoklarPage() {
                   <SelectValue placeholder="Alt Grup" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tüm Alt Gruplar</SelectItem>
+                  <SelectItem value="all">
+                    {altGruplar.length === 0 ? 'Tümü' : 'Tüm Alt Gruplar'}
+                  </SelectItem>
                   {altGruplar.map((ag) => (
                     <SelectItem key={ag.sta_kod} value={ag.sta_kod}>
                       {ag.sta_kod} - {ag.sta_isim}

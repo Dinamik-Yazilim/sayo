@@ -40,6 +40,11 @@ function menuItems(user: Member) {
       href: "/",
     },
     {
+      title: 'Mağaza Siparişi',
+      icon: <ShoppingCartIcon className="h-6 w-6" />,
+      href: "/magaza-siparisi",
+    },
+    {
       title: 'Tanımlamalar',
       icon: <DatabaseIcon className="h-6 w-6" />,
       submenu: [
@@ -47,6 +52,7 @@ function menuItems(user: Member) {
         { title: 'Stok Alt Grupları', href: "/definitions/stok-alt-gruplari", icon: <PackageIcon className="h-5 w-5" /> },
         { title: 'Stoklar', href: "/definitions/stoklar", icon: <PackageIcon className="h-5 w-5" /> },
         { title: 'Depolar', href: "/definitions/depolar", icon: <Warehouse className="h-5 w-5" /> },
+        { title: 'Tedarikçiler', href: "/definitions/tedarikciler", icon: <Building2Icon className="h-5 w-5" /> },
       ],
     },
     {

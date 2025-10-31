@@ -43,16 +43,28 @@ export default function SettingsPage({ }: Props) {
 
       title='Kullanıcılar'
       icon=<Users2Icon />
-      onHeaderPaint={() => <div className='grid grid-cols-4 w-full'>
+      onHeaderPaint={() => <div className='grid grid-cols-5 w-full'>
         <div>Kullanıcı Adı</div>
         <div>Ad Soyad</div>
         <div>Rol</div>
+        <div>Yetkili Depolar</div>
         <div className='text-center'>Pasif mi?</div>
       </div>}
-      onRowPaint={(e: Member, colIndex) => <div className='grid grid-cols-4 w-full'>
+      onRowPaint={(e: Member, colIndex) => <div className='grid grid-cols-5 w-full'>
         <div>{e.username}</div>
         <div>{e.name}</div>
         <div>{roleList.find(r => r._id == e.role)?.name}</div>
+        <div>
+          {e.tumDepoYetkisi ? (
+            <span className="text-green-600 font-semibold">Tüm Depolar</span>
+          ) : e.yetkiliDepoNos && e.yetkiliDepoNos.length > 0 ? (
+            <span className="text-sm text-muted-foreground">
+              Depo: {e.yetkiliDepoNos.join(', ')}
+            </span>
+          ) : (
+            <span className="text-red-500 text-xs">Yetki Yok</span>
+          )}
+        </div>
         <div className='text-center'>{e.passive ? '✅' : ''}</div>
       </div>}
     />

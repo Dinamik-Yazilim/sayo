@@ -12,7 +12,7 @@ export const getStokAnaGruplari = () => `
   SELECT 
     san_kod,
     san_isim,
-    (SELECT COUNT(*) FROM STOK_ALT_GRUPLARI WHERE sta_ana_grup_kodu = san_kod AND sta_iptal = 0) as alt_grup_sayisi,
+    (SELECT COUNT(*) FROM STOK_ALT_GRUPLARI WHERE sta_ana_grup_kod = san_kod AND sta_iptal = 0) as alt_grup_sayisi,
     (SELECT COUNT(*) FROM STOKLAR WHERE sto_anagrup_kod = san_kod AND sto_iptal = 0) as stok_sayisi
   FROM STOK_ANA_GRUPLARI
   WHERE san_iptal = 0
@@ -27,7 +27,7 @@ export const searchStokAnaGruplari = (searchTerm: string) => `
   SELECT 
     san_kod,
     san_isim,
-    (SELECT COUNT(*) FROM STOK_ALT_GRUPLARI WHERE sta_ana_grup_kodu = san_kod AND sta_iptal = 0) as alt_grup_sayisi,
+    (SELECT COUNT(*) FROM STOK_ALT_GRUPLARI WHERE sta_ana_grup_kod = san_kod AND sta_iptal = 0) as alt_grup_sayisi,
     (SELECT COUNT(*) FROM STOKLAR WHERE sto_anagrup_kod = san_kod AND sto_iptal = 0) as stok_sayisi
   FROM STOK_ANA_GRUPLARI
   WHERE san_iptal = 0
@@ -43,13 +43,13 @@ export const getStokAltGruplari = (anaGrupKod?: string) => `
   SELECT 
     sta.sta_kod,
     sta.sta_isim,
-    sta.sta_ana_grup_kodu,
+    sta.sta_ana_grup_kod,
     san.san_isim as ana_grup_isim,
     (SELECT COUNT(*) FROM STOKLAR WHERE sto_altgrup_kod = sta.sta_kod AND sto_iptal = 0) as stok_sayisi
   FROM STOK_ALT_GRUPLARI sta
-  LEFT JOIN STOK_ANA_GRUPLARI san ON san.san_kod = sta.sta_ana_grup_kodu
+  LEFT JOIN STOK_ANA_GRUPLARI san ON san.san_kod = sta.sta_ana_grup_kod
   WHERE sta.sta_iptal = 0
-    ${anaGrupKod && anaGrupKod !== 'all' ? `AND sta.sta_ana_grup_kodu = '${anaGrupKod}'` : ''}
+    ${anaGrupKod && anaGrupKod !== 'all' ? `AND sta.sta_ana_grup_kod = '${anaGrupKod}'` : ''}
   ORDER BY sta.sta_kod
 `
 
@@ -62,14 +62,14 @@ export const searchStokAltGruplari = (searchTerm: string, anaGrupKod?: string) =
   SELECT 
     sta.sta_kod,
     sta.sta_isim,
-    sta.sta_ana_grup_kodu,
+    sta.sta_ana_grup_kod,
     san.san_isim as ana_grup_isim,
     (SELECT COUNT(*) FROM STOKLAR WHERE sto_altgrup_kod = sta.sta_kod AND sto_iptal = 0) as stok_sayisi
   FROM STOK_ALT_GRUPLARI sta
-  LEFT JOIN STOK_ANA_GRUPLARI san ON san.san_kod = sta.sta_ana_grup_kodu
+  LEFT JOIN STOK_ANA_GRUPLARI san ON san.san_kod = sta.sta_ana_grup_kod
   WHERE sta.sta_iptal = 0
     AND (sta.sta_kod LIKE '%${searchTerm}%' OR sta.sta_isim LIKE '%${searchTerm}%')
-    ${anaGrupKod && anaGrupKod !== 'all' ? `AND sta.sta_ana_grup_kodu = '${anaGrupKod}'` : ''}
+    ${anaGrupKod && anaGrupKod !== 'all' ? `AND sta.sta_ana_grup_kod = '${anaGrupKod}'` : ''}
   ORDER BY sta.sta_kod
 `
 

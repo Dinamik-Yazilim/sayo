@@ -56,3 +56,20 @@ export const searchDepolar = (searchTerm: string, depTipi?: string) => {
     ORDER BY dep_no
   `
 }
+
+/**
+ * Depolar - Mağazalar (Sadece mağaza tipindeki depolar)
+ * Mağaza siparişi için kullanılır
+ */
+export const getDepolarMagazalar = () => `
+  SELECT 
+    dep_no,
+    dep_adi,
+    dep_tipi,
+    dep_sor_mer_kodu,
+    dep_proje_kodu
+  FROM DEPOLAR
+  WHERE dep_iptal = 0
+    AND dep_tipi IN (1, 2, 3)
+  ORDER BY dep_adi
+`

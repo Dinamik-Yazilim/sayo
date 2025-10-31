@@ -35,31 +35,45 @@ function getOne(dbModel, sessionDoc, req) {
 }
 
 function getList(dbModel, sessionDoc, req) {
-  return new Promise((resolve, reject) => {
-    let options = {
-      page: req.query.page || 1,
-      limit: req.query.pageSize || 10,
-      sort: { name: 1 }
-    }
-    let filter = { organization: sessionDoc.organization }
-    if (req.query.passive != undefined) {
-      if (req.query.passive.toString() == 'false') filter.passive = false
-      if (req.query.passive.toString() == 'true') filter.passive = true
-    }
-    if (req.query.role) {
-      filter.role = req.query.role
-    }
+  return new Promise(async (resolve, reject) => {
+    try {
+      let options = {
+        page: req.query.page || 1,
+        limit: req.query.pageSize || 10,
+        sort: { name: 1 }
+      }
+      let filter = { organization: sessionDoc.organization }
+      if (req.query.passive != undefined) {
+        if (req.query.passive.toString() == 'false') filter.passive = false
+        if (req.query.passive.toString() == 'true') filter.passive = true
+      }
+      if (req.query.role) {
+        filter.role = req.query.role
+      }
 
-    if (req.query.name || req.query.username || req.query.search) {
-      filter.$or = [
-        { username: { $regex: `.*${req.query.username || req.query.search}.*`, $options: 'i' } },
-        { name: { $regex: `.*${req.query.name || req.query.search}.*`, $options: 'i' } }
-      ]
+      if (req.query.name || req.query.username || req.query.search) {
+        filter.$or = [
+          { username: { $regex: `.*${req.query.username || req.query.search}.*`, $options: 'i' } },
+          { name: { $regex: `.*${req.query.name || req.query.search}.*`, $options: 'i' } }
+        ]
+      }
 
+      const result = await dbModel.members.paginate(filter, options)
+
+      // Session db'ye göre depo yetkilerini ekle
+      if (sessionDoc.db && result.docs) {
+        result.docs = result.docs.map(member => {
+          const memberObj = member.toObject ? member.toObject() : member
+          const dbYetki = memberObj.depoYetkileri?.find(y => y.db === sessionDoc.db)
+          memberObj.yetkiliDepoNos = dbYetki ? dbYetki.depoNos : []
+          return memberObj
+        })
+      }
+
+      resolve(result)
+    } catch (err) {
+      reject(err)
     }
-    dbModel.members
-      .paginate(filter, options)
-      .then(resolve).catch(reject)
   })
 }
 

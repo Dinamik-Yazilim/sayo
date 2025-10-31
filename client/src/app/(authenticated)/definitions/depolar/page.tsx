@@ -64,7 +64,7 @@ export default function DepolarPage() {
         ? searchDepolar(searchTerm, selectedTip)
         : getDepolar(selectedTip)
 
-      const data = await postItem('/mikro/get', token, { query })
+      const data = await postItem('/mikro/depolar', token, { query })
       setDepolar(data || [])
       setLastSearchTerm(searchTerm)
     } catch (err) {
@@ -140,7 +140,7 @@ export default function DepolarPage() {
             Depolar
           </CardTitle>
           <CardDescription>
-            MikroERP Depo Tanımları ({depolar.length} kayıt)
+            Depo Tanımları ({depolar.length} kayıt)
           </CardDescription>
         </CardHeader>
         <CardContent>

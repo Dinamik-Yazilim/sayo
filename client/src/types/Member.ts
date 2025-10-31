@@ -1,5 +1,10 @@
 import { Organization } from "./Organization"
 
+export interface DepoYetkisi {
+  db: string
+  depoNos: number[]
+}
+
 export interface Member {
   _id?: string
   organization?: Organization | null
@@ -7,6 +12,9 @@ export interface Member {
   name?: string
   role?: string
   passive?: boolean
+  depoYetkileri?: DepoYetkisi[]
+  tumDepoYetkisi?: boolean
+  yetkiliDepoNos?: number[] // Backend'den gelen session.db'ye göre depo listesi
 }
 
 export function getRoleList() {

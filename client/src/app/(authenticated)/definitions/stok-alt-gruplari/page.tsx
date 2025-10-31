@@ -124,7 +124,7 @@ export default function StokAltGruplariPage() {
         <CardHeader>
           <CardTitle>Stok Alt Grupları</CardTitle>
           <CardDescription>
-            MikroERP Stok Alt Grupları Listesi ({gruplar.length} kayıt)
+            Stok Alt Grupları Listesi ({gruplar.length} kayıt)
           </CardDescription>
         </CardHeader>
         <CardContent>
