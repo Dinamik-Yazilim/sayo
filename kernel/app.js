@@ -14,7 +14,7 @@ var cors = require('cors')
 
 module.exports = () => new Promise(async (resolve, reject) => {
   app.use(cors())
-  app.use(favicon(path.join(__root, '/public/favicon.ico')))
+  app.use(favicon(path.join(__root, '/public/img/icon.png')))
 
   process.env.NODE_ENV === 'development' && app.use(logger('dev'))
 
@@ -28,7 +28,6 @@ module.exports = () => new Promise(async (resolve, reject) => {
 
   app.use('/', express.static(path.join(__root, '/public')))
 
-  global.t = require('./lib/i18n').t
   global.getSearchParams = require('./lib/searchHelper').getSearchParams
 
   require('./routes')(app)

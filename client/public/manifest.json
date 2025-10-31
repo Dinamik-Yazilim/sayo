@@ -16,34 +16,14 @@
   },
   "icons": [
     {
-      "src": "img/favicon.svg",
+      "src": "img/icon.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "img/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "img/screenshot01.jpg",
-      "sizes": "600x700",
-      "type": "image/jpg"
     }
   ],
   "id": "/",
-  "lang": "en",
-  "shortcuts": [
-    {
-      "name": "Dashboard",
-      "url": "/pwa/shortcuts/dashboard",
-      "description": "Dashboard"
-    }
-  ],
+  "lang": "tr",
   "categories": [
     "business",
     "finance",

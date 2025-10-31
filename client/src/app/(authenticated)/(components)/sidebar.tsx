@@ -5,13 +5,14 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, HelpCircle, CheckCircle2Icon, ChartAreaIcon, TruckIcon, ShoppingCartIcon, ComputerIcon, Users2Icon, Building2Icon } from "lucide-react"
+import { Home, Settings, Users, ShoppingCart, BarChart, FileText, Mail, Bell, HelpCircle, CheckCircle2Icon, ChartAreaIcon, TruckIcon, ShoppingCartIcon, ComputerIcon, Users2Icon, Building2Icon, HomeIcon, PackageIcon, DatabaseIcon, Warehouse } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import Cookies from 'js-cookie'
 import { Member } from "@/types/Member"
 import { SignOutButton } from "./signout-button"
+import Dashboard from "../dashboard/page"
 
 // Define menu item types
 interface MenuItem {
@@ -34,55 +35,19 @@ interface Props {
 function menuItems(user: Member) {
   let l = [
     {
-      title: 'Gösterge Paneli',
-      icon: <Home className="h-6 w-6" />,
+      title: 'Dashboard',
+      icon: <HomeIcon className="h-6 w-6" />,
       href: "/",
     },
     {
-      title: 'Satın Alma',
-      icon: <TruckIcon className="h-6 w-6" />,
+      title: 'Tanımlamalar',
+      icon: <DatabaseIcon className="h-6 w-6" />,
       submenu: [
-        { title: 'Envanter', href: "/purchase/inventory", icon: <BarChart className="h-5 w-5" /> },
-        { title: 'Tedarikçiler', href: "/module-closed/vendors", icon: <Users className="h-5 w-5" /> },
-        { title: 'Satın Alma Siparişleri', href: "/purchase/orders", icon: <ShoppingCart className="h-5 w-5" /> },
-        { title: 'Satın Alma Koşulları', href: "/purchase/conditions", icon: <FileText className="h-5 w-5" /> },
+        { title: 'Stok Ana Grupları', href: "/definitions/stok-ana-gruplari", icon: <PackageIcon className="h-5 w-5" /> },
+        { title: 'Stok Alt Grupları', href: "/definitions/stok-alt-gruplari", icon: <PackageIcon className="h-5 w-5" /> },
+        { title: 'Stoklar', href: "/definitions/stoklar", icon: <PackageIcon className="h-5 w-5" /> },
+        { title: 'Depolar', href: "/definitions/depolar", icon: <Warehouse className="h-5 w-5" /> },
       ],
-    },
-    {
-      title: 'Raporlar',
-      icon: <ChartAreaIcon className="h-6 w-6" />,
-      submenu: [
-        { title: "Satın Alma Raporu", href: "/reports/purchase", icon: <FileText className="h-5 w-5" /> },
-        { title: "Satış Devir Hızı", href: "/module-closed/sales-cycle", icon: <FileText className="h-5 w-5" /> },
-        { title: "Satış Raporu", href: "/module-closed/satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Saatlik Satış Raporu", href: "/module-closed/saatlik-satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Günlük Ciro", href: "/module-closed/gunluk-ciro", icon: <FileText className="h-5 w-5" /> },
-        { title: "Aylık Ciro", href: "/module-closed/aylik-ciro", icon: <FileText className="h-5 w-5" /> },
-        { title: "Mağaza Masrafları", href: "/module-closed/magaza-masraflari", icon: <FileText className="h-5 w-5" /> },
-        { title: "Envanter", href: "/module-closed/envanter", icon: <FileText className="h-5 w-5" /> },
-        { title: "Tedarikçiye Göre Satış Raporu", href: "/module-closed/tedarikciye-gore-satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Tedarikçiye Göre Sipariş Karşılama", href: "/module-closed/tedarikciye-gore-siparis-karsilama", icon: <FileText className="h-5 w-5" /> },
-        { title: "Satın Almaya Göre Satış Raporu", href: "/module-closed/satin-almaya-gore-satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Nakit Akış", href: "/module-closed/nakit-akis", icon: <FileText className="h-5 w-5" /> },
-        { title: "Müşteri Satış Raporu", href: "/module-closed/musteri-satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Ürün Satış Raporu", href: "/module-closed/urun-satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Belge Bazlı Ürün Raporu", href: "/module-closed/belge-bazli-urun-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "İade Nedenleri", href: "/module-closed/iade-nedenleri", icon: <FileText className="h-5 w-5" /> },
-        { title: "Fire Raporu", href: "/module-closed/fire-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "KDV Bazlı Satış Raporu", href: "/module-closed/kdv-bazli-satis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Ürün Stok Durumu", href: "/module-closed/urun-stok-durumu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Market Sipariş Raporu", href: "/module-closed/market-siparis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Depo Sipariş Raporu", href: "/module-closed/depo-siparis-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Günlük Kasa Defteri", href: "/module-closed/gunluk-kasa-defteri", icon: <FileText className="h-5 w-5" /> },
-        { title: "İndirimler Raporu", href: "/module-closed/indirimler-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Fiyat Değişim Raporu", href: "/module-closed/fiyat-degisim-raporu", icon: <FileText className="h-5 w-5" /> },
-        { title: "Marj Raporu", href: "/module-closed/marj-raporu", icon: <FileText className="h-5 w-5" /> },
-      ],
-    },
-    {
-      title: 'Bildirimler',
-      icon: <Bell className="h-6 w-6" />,
-      href: "/notifications",
     },
     {
       title: 'Ayarlar',

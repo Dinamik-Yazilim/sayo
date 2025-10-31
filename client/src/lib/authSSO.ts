@@ -19,7 +19,7 @@ const authOptions = {
   theme: {
     brandColor: '#2563eb',
     buttonText: 'fitifiti qwerty',
-    logo: '/img/favicon.svg',
+    logo: '/img/icon.png',
     colorScheme: 'dark'
   },
   cookies: {

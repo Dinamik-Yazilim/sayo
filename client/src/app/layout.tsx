@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_TITLE || 'ENV ERROR',
   description: process.env.NEXT_PUBLIC_APP_DESCRIPTION || 'ENV ERROR',
   icons: {
-    icon: '/img/favicon.svg',
-    shortcut: '/img/favicon.svg',
-    apple: '/img/favicon.svg'
+    icon: '/img/icon.png',
+    shortcut: '/img/icon.png',
+    apple: '/img/icon.png'
   },
   manifest: '/manifest.json'
 }

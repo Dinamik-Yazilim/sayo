@@ -8,7 +8,7 @@ import { Member } from "@/types/Member"
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from "react"
-import { description } from "../home/dashboard/rapor1"
+import { description } from "../dashboard/dashboard/rapor1"
 
 
 

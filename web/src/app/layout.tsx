@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "DinamikSAYO",
   description: "Mikro ERP V16 ve V17 ile entegre çalışan profesyonel satın alma yönetim sistemi - Dinamik Yazılım Ltd. Şti.",
   icons: {
-    icon: "/img/favicon.svg",
+    icon: "/img/icon.png",
   },
 }
 
