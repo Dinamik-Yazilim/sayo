@@ -45,6 +45,11 @@ function menuItems(user: Member) {
       href: "/magaza-siparisi",
     },
     {
+      title: 'Siparişler',
+      icon: <FileText className="h-6 w-6" />,
+      href: "/siparisler",
+    },
+    {
       title: 'Tanımlamalar',
       icon: <DatabaseIcon className="h-6 w-6" />,
       submenu: [
@@ -59,6 +64,7 @@ function menuItems(user: Member) {
       title: 'Ayarlar',
       icon: <Settings className="h-6 w-6" />,
       submenu: [
+        { title: 'Email Ayarları', href: "/settings/email", icon: <Mail className="h-5 w-5" /> },
         { title: 'Kullanıcılar', href: "/settings/users", icon: <Users className="h-5 w-5" /> },
         { title: 'Konnektör', href: "/settings/connector", icon: <ComputerIcon className="h-5 w-5" /> },
         { title: 'Çalışma Parametreleri', href: "/settings/workingParams", icon: <Settings className="h-5 w-5" /> },

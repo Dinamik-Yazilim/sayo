@@ -49,6 +49,9 @@ module.exports = function (dbModel) {
         index: true
       },
 
+      // Arşiv durumu
+      isArchived: { type: Boolean, default: false, index: true },
+
       // Oluşturan kullanıcı
       createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'members' },
       updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'members' },
@@ -133,8 +136,10 @@ module.exports = function (dbModel) {
   // Statics
   schema.statics.findByOrganization = function (organizationId, options = {}) {
     const query = { organization: organizationId }
+    if (options.db) query.db = options.db
     if (options.status) query.status = options.status
     if (options.depoNo) query.depoNo = options.depoNo
+    if (options.isArchived !== undefined) query.isArchived = options.isArchived
 
     return this.find(query)
       .sort({ createdAt: -1 })
@@ -142,12 +147,15 @@ module.exports = function (dbModel) {
       .populate('updatedBy', 'name email')
   }
 
-  schema.statics.findDrafts = function (organizationId, depoNo) {
-    return this.find({
+  schema.statics.findDrafts = function (organizationId, depoNo, dbName) {
+    const query = {
       organization: organizationId,
       depoNo: depoNo,
       status: 'draft'
-    })
+    }
+    if (dbName) query.db = dbName
+
+    return this.find(query)
       .sort({ updatedAt: -1 })
       .populate('createdBy', 'name email')
       .populate('updatedBy', 'name email')

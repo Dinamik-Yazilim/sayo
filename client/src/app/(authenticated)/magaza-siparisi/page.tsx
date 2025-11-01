@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { OrderSummary } from '@/components/order-summary'
 import {
   Loader2,
   ShoppingCart,
@@ -104,10 +106,17 @@ interface SiparisKalemi {
 }
 
 export default function MagazaSiparisiPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const resumeCartId = searchParams.get('cartId')
+
   const [step, setStep] = useState(1) // 1: Mağaza Seçimi, 2: Ürün Seçimi, 3: Sipariş Onayı
   const [initialLoading, setInitialLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [token, setToken] = useState('')
+  const [currentCartId, setCurrentCartId] = useState<string | null>(resumeCartId)
+  const [db, setDb] = useState<string>('')
+  const [organizationId, setOrganizationId] = useState<string>('')
   const { toast } = useToast()
 
   // Step 1: Mağaza Seçimi
@@ -132,6 +141,7 @@ export default function MagazaSiparisiPage() {
 
   // Sipariş kalemleri
   const [siparisKalemleri, setSiparisKalemleri] = useState<SiparisKalemi[]>([])
+  const [sepetVisible, setSepetVisible] = useState(false) // Sepet görünürlüğü
 
   // Her ürün için miktar state'i - ürün kodu ve birim kombinasyonu
   const [urunMiktarlari, setUrunMiktarlari] = useState<Record<string, number>>({})
@@ -164,7 +174,31 @@ export default function MagazaSiparisiPage() {
     if (!token) {
       setToken(Cookies.get('token') || '')
     }
+
+    // Load user info for organization and db
+    try {
+      const userStr = Cookies.get('user')
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        if (user.organization) {
+          setOrganizationId(user.organization._id || user.organization)
+        }
+      }
+      const dbFromCookie = Cookies.get('db')
+      if (dbFromCookie) {
+        setDb(dbFromCookie)
+      }
+    } catch (err) {
+      console.error('Error loading user/db:', err)
+    }
   }, [])
+
+  // Load cart if resuming an existing order
+  useEffect(() => {
+    if (token && resumeCartId && organizationId && db) {
+      loadCartById(resumeCartId)
+    }
+  }, [token, resumeCartId, organizationId, db])
 
   useEffect(() => {
     if (token && step === 1) {
@@ -193,6 +227,199 @@ export default function MagazaSiparisiPage() {
       loadStoklar()
     }
   }, [selectedAnaGrup, selectedAltGrup, selectedKategori, selectedMarka, selectedTedarikci])
+
+  // Auto-save cart when items change
+  useEffect(() => {
+    if (currentCartId && token && selectedMagaza && siparisKalemleri.length >= 0) {
+      console.log('Auto-save triggered - will save in 1 second...', siparisKalemleri.length, 'items')
+
+      const timer = setTimeout(() => {
+        saveCartItems()
+      }, 1000) // Debounce 1 second
+
+      return () => clearTimeout(timer)
+    }
+  }, [siparisKalemleri, currentCartId, token, selectedMagaza])
+
+  // Load cart by ID (for resuming)
+  const loadCartById = async (cartId: string) => {
+    try {
+      setLoading(true)
+      console.log('loadCartById - loading cart:', cartId)
+
+      const cart = await postItem(`/cart/get/${cartId}`, token, {})
+      console.log('loadCartById - cart loaded:', cart)
+
+      if (cart) {
+        setCurrentCartId(cart._id)
+
+        // Önce magazalar listesini yükle (eğer yoksa)
+        if (magazalar.length === 0) {
+          console.log('loadCartById - loading magazalar first...')
+          const data = await postItem('/mikro/depolar', token, { query: getDepolarMagazalar() })
+          setMagazalar(data || [])
+
+          // Yeni yüklenen listeden mağazayı bul
+          const magaza = (data || []).find((m: Depo) => m.dep_no === cart.depoNo)
+          if (magaza) {
+            console.log('loadCartById - magaza found:', magaza.dep_adi)
+            setSelectedMagaza(magaza)
+          } else {
+            console.log('loadCartById - magaza not found for depoNo:', cart.depoNo)
+          }
+        } else {
+          // Mevcut listeden mağazayı bul
+          const magaza = magazalar.find(m => m.dep_no === cart.depoNo)
+          if (magaza) {
+            console.log('loadCartById - magaza found from existing list:', magaza.dep_adi)
+            setSelectedMagaza(magaza)
+          } else {
+            console.log('loadCartById - magaza not found in existing list for depoNo:', cart.depoNo)
+          }
+        }
+
+        // Convert cart lines to siparis kalemleri
+        const kalemler: SiparisKalemi[] = (cart.lines || []).map((line: any) => ({
+          stok: {
+            sto_kod: line.itemCode,
+            sto_isim: line.itemName,
+            sto_birim1_ad: line.unitCode || 'ADET',
+            sto_birim2_ad: '',
+            sto_birim2_katsayi: 0,
+            sto_birim3_ad: '',
+            sto_birim3_katsayi: 0
+          } as Stok,
+          miktar: line.quantity,
+          birim: 'birim1',
+          birimAd: line.unitCode || 'ADET',
+          katsayi: 1
+        }))
+
+        console.log('loadCartById - kalemler loaded:', kalemler.length)
+        setSiparisKalemleri(kalemler)
+
+        // Go to step 2
+        setStep(2)
+
+        toast({
+          title: 'Sipariş Yüklendi',
+          description: `Taslak sipariş yüklendi (${kalemler.length} ürün)`,
+        })
+      }
+    } catch (err) {
+      console.error('Cart yüklenirken hata:', err)
+      toast({
+        title: 'Hata',
+        description: 'Sipariş yüklenirken bir hata oluştu',
+        variant: 'destructive'
+      })
+    } finally {
+      setLoading(false)
+      setInitialLoading(false)
+    }
+  }
+
+  // Load or create draft cart for selected depot
+  const loadOrCreateDraftCart = async (depoNo: number, depoAdi: string) => {
+    if (!organizationId || !db) {
+      console.error('loadOrCreateDraftCart - Organization or DB not set:', { organizationId, db })
+      return
+    }
+
+    try {
+      console.log('loadOrCreateDraftCart - checking for existing draft...', { depoNo, db, organizationId })
+
+      // Check if there's an existing draft for this depot
+      const drafts = await postItem(`/cart/drafts?depoNo=${depoNo}`, token, {})
+
+      console.log('loadOrCreateDraftCart - drafts found:', drafts ? drafts.length : 0)
+
+      if (drafts && drafts.length > 0) {
+        // Use existing draft
+        const existingCart = drafts[0]
+        console.log('loadOrCreateDraftCart - using existing cart:', existingCart._id)
+        setCurrentCartId(existingCart._id)
+
+        // Load existing items
+        const kalemler: SiparisKalemi[] = (existingCart.lines || []).map((line: any) => ({
+          stok: {
+            sto_kod: line.itemCode,
+            sto_isim: line.itemName,
+            sto_birim1_ad: line.unitCode || 'ADET',
+            sto_birim2_ad: '',
+            sto_birim2_katsayi: 0,
+            sto_birim3_ad: '',
+            sto_birim3_katsayi: 0
+          } as Stok,
+          miktar: line.quantity,
+          birim: 'birim1',
+          birimAd: line.unitCode || 'ADET',
+          katsayi: 1
+        }))
+
+        setSiparisKalemleri(kalemler)
+
+        if (kalemler.length > 0) {
+          toast({
+            title: 'Taslak Yüklendi',
+            description: `Önceki taslak siparişiniz yüklendi (${kalemler.length} ürün)`,
+          })
+        }
+      } else {
+        // Create new cart
+        console.log('loadOrCreateDraftCart - creating new cart...', { db, depoNo })
+
+        const newCart = await postItem('/cart/create', token, {
+          db,
+          depoNo,
+          lines: [],
+          notes: ''
+        })
+
+        console.log('loadOrCreateDraftCart - new cart created:', newCart._id)
+        setCurrentCartId(newCart._id)
+      }
+    } catch (err) {
+      console.error('Cart yüklenirken/oluşturulurken hata:', err)
+      // Don't show error toast, just log it
+    }
+  }
+
+  // Save cart items to backend
+  const saveCartItems = async () => {
+    if (!currentCartId || !selectedMagaza) {
+      console.log('saveCartItems - skip: currentCartId =', currentCartId, 'selectedMagaza =', selectedMagaza)
+      return
+    }
+
+    try {
+      console.log('saveCartItems - saving...', siparisKalemleri.length, 'items')
+
+      const lines = siparisKalemleri.map(k => ({
+        itemCode: k.stok.sto_kod,
+        itemName: k.stok.sto_isim,
+        unitCode: k.birimAd,
+        quantity: k.miktar,
+        price: 0,
+        kdvYuzde: 0,
+        isk1Yuzde: 0,
+        isk2Yuzde: 0
+      }))
+
+      console.log('saveCartItems - lines:', lines)
+      console.log('saveCartItems - URL:', `/cart/update/${currentCartId}`)
+
+      const result = await postItem(`/cart/update/${currentCartId}`, token, {
+        lines,
+        status: 'draft'
+      })
+
+      console.log('saveCartItems - saved successfully:', result)
+    } catch (err) {
+      console.error('Cart kaydedilirken hata:', err)
+      // Silent fail - don't interrupt user experience
+    }
+  }
 
   const loadMagazalar = async () => {
     try {
@@ -285,8 +512,12 @@ export default function MagazaSiparisiPage() {
     }
   }
 
-  const handleMagazaSelect = (magaza: Depo) => {
+  const handleMagazaSelect = async (magaza: Depo) => {
     setSelectedMagaza(magaza)
+    // Sepeti temizle - yeni depo için yeni cart yüklenecek
+    setSiparisKalemleri([])
+    setCurrentCartId(null)
+    await loadOrCreateDraftCart(magaza.dep_no, magaza.dep_adi)
     setStep(2)
   }
 
@@ -474,22 +705,46 @@ export default function MagazaSiparisiPage() {
                     <CardDescription>Depo No: {selectedMagaza.dep_no}</CardDescription>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setStep(1)}>
-                  <ChevronLeft className="h-4 w-4 mr-2" />
-                  Mağaza Değiştir
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => {
+                    // Mağaza değiştirirken mevcut sepeti temizle
+                    setSiparisKalemleri([])
+                    setCurrentCartId(null)
+                    setSelectedMagaza(null)
+                    setStep(1)
+                  }}>
+                    <ChevronLeft className="h-4 w-4 mr-2" />
+                    Mağaza Değiştir
+                  </Button>
+                  {siparisKalemleri.length > 0 && (
+                    <Button
+                      variant={sepetVisible ? "secondary" : "default"}
+                      size="sm"
+                      onClick={() => setSepetVisible(!sepetVisible)}
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Sepet ({toplamUrunSayisi} ürün)
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardHeader>
           </Card>
 
           {/* Sipariş Sepeti */}
-          {siparisKalemleri.length > 0 && (
+          {siparisKalemleri.length > 0 && sepetVisible && (
             <Card className="border-2 border-primary">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Sipariş Sepeti ({toplamUrunSayisi} ürün)
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingCart className="h-5 w-5" />
+                    Sipariş Sepeti ({toplamUrunSayisi} ürün)
+                  </CardTitle>
+                  <Button variant="ghost" size="sm" onClick={() => setSepetVisible(false)}>
+                    <X className="h-4 w-4 mr-2" />
+                    Gizle
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
@@ -861,81 +1116,18 @@ export default function MagazaSiparisiPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Mağaza Bilgisi */}
-              <div className="border rounded-lg p-4 bg-muted/50">
-                <h3 className="font-semibold mb-2 flex items-center gap-2">
-                  <Store className="h-5 w-5" />
-                  Mağaza Bilgileri
-                </h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-muted-foreground">Mağaza Adı:</div>
-                  <div className="font-medium">{selectedMagaza.dep_adi}</div>
-                  <div className="text-muted-foreground">Mağaza No:</div>
-                  <div className="font-medium">{selectedMagaza.dep_no}</div>
-                  <div className="text-muted-foreground">Depo Tipi:</div>
-                  <div className="font-medium">
-                    {selectedMagaza.dep_tipi === 1 ? 'Satış Mağazası' :
-                      selectedMagaza.dep_tipi === 2 ? 'Merkez Depo' :
-                        selectedMagaza.dep_tipi === 3 ? 'Şube Deposu' :
-                          `Tip ${selectedMagaza.dep_tipi}`}
-                  </div>
-                </div>
-              </div>
-
-              {/* Sipariş Kalemleri */}
-              <div className="border rounded-lg p-4">
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  Sipariş Kalemleri ({siparisKalemleri.length} Ürün, {toplamUrunSayisi} Adet)
-                </h3>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {siparisKalemleri.map((kalem, index) => (
-                    <div key={`${kalem.stok.sto_kod}-${kalem.birim}`} className="border rounded-md p-3 bg-background">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">{index + 1}</Badge>
-                            <span className="font-semibold">{kalem.stok.sto_kod}</span>
-                          </div>
-                          <div className="text-sm mt-1">{kalem.stok.sto_isim}</div>
-                          <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                            {kalem.stok.ana_grup_isim && (
-                              <span>Ana Grup: {kalem.stok.ana_grup_isim}</span>
-                            )}
-                            {kalem.stok.marka_isim && (
-                              <span>Marka: {kalem.stok.marka_isim}</span>
-                            )}
-                          </div>
-                          <Badge variant="secondary" className="text-xs mt-2">
-                            Birim: {kalem.birimAd}
-                            {kalem.katsayi > 1 && ` (${kalem.katsayi}x)`}
-                          </Badge>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">{kalem.miktar}</div>
-                          <div className="text-xs text-muted-foreground">{kalem.birimAd}</div>
-                          {kalem.katsayi > 1 && (
-                            <div className="text-xs text-muted-foreground mt-1">
-                              = {kalem.miktar * kalem.katsayi} {kalem.stok.sto_birim1_ad}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Özet */}
-              <div className="border-2 border-primary rounded-lg p-4 bg-primary/5">
-                <h3 className="font-semibold mb-2">Sipariş Özeti</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="text-muted-foreground">Toplam Ürün Çeşidi:</div>
-                  <div className="font-bold text-right">{siparisKalemleri.length}</div>
-                  <div className="text-muted-foreground">Toplam Adet:</div>
-                  <div className="font-bold text-right text-primary text-xl">{toplamUrunSayisi}</div>
-                </div>
-              </div>
+              {/* Sipariş Özeti Komponenti */}
+              <OrderSummary
+                magaza={selectedMagaza}
+                lines={siparisKalemleri.map(kalem => ({
+                  itemCode: kalem.stok.sto_kod,
+                  itemName: kalem.stok.sto_isim,
+                  unitCode: kalem.birimAd,
+                  quantity: kalem.miktar * kalem.katsayi,
+                  price: 0
+                }))}
+                showTitle={false}
+              />
 
               {/* Butonlar */}
               <div className="flex gap-3">
@@ -951,7 +1143,8 @@ export default function MagazaSiparisiPage() {
                       title: '✓ Sipariş Onaylandı!',
                       description: `${toplamUrunSayisi} adet ürün içeren sipariş oluşturuldu`,
                     })
-                    // TODO: Sipariş kaydetme işlemi
+                    // Siparişler sayfasına yönlendir
+                    router.push('/siparisler')
                   }}
                 >
                   <Check className="h-5 w-5 mr-2" />
