@@ -16,6 +16,7 @@ import { NotificationButton } from '@/components/notify-icon'
 import { Sidebar } from './sidebar'
 import { Member } from '@/types/Member'
 import { Organization } from '@/types/Organization'
+import { ConnectorStatus } from './connector-status'
 
 export function Header() {
   const [user, setUser] = useState<Member>()
@@ -48,11 +49,14 @@ export function Header() {
         </>}
       </div>
       <div className="flex items-center justify-end gap-2">
-
+        <div className="mr-2">
+          <ConnectorStatus />
+        </div>
         <UserMenu />
         <div className='flex lg:hidden'>{MobileMenu(showDbList)}</div>
 
       </div>
+
     </header>
   )
 }

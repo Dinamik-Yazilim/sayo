@@ -5,7 +5,6 @@ module.exports = (dbModel, sessionDoc, req) =>
     switch (req.method.toUpperCase()) {
       case 'GET':
         getOne(dbModel, sessionDoc, req).then(resolve).catch(reject)
-
         break
       case 'POST':
       case 'PUT':
@@ -57,7 +56,6 @@ function save(dbModel, sessionDoc, req) {
     }
   })
 }
-
 
 function connectorTest(dbModel, sessionDoc, req) {
   return new Promise(async (resolve, reject) => {

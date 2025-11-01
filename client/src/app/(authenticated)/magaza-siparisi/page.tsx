@@ -59,6 +59,8 @@ interface Stok {
   sto_birim1_ad: string
   sto_birim2_ad: string
   sto_birim2_katsayi: number
+  sto_birim3_ad: string
+  sto_birim3_katsayi: number
   barkod1: string
   barkod2: string
   barkod3: string
@@ -96,10 +98,13 @@ interface Tedarikci {
 interface SiparisKalemi {
   stok: Stok
   miktar: number
+  birim: 'birim1' | 'birim2' | 'birim3'
+  birimAd: string
+  katsayi: number
 }
 
 export default function MagazaSiparisiPage() {
-  const [step, setStep] = useState(1) // 1: Mağaza Seçimi, 2: Ürün Seçimi
+  const [step, setStep] = useState(1) // 1: Mağaza Seçimi, 2: Ürün Seçimi, 3: Sipariş Onayı
   const [initialLoading, setInitialLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [token, setToken] = useState('')
@@ -127,6 +132,33 @@ export default function MagazaSiparisiPage() {
 
   // Sipariş kalemleri
   const [siparisKalemleri, setSiparisKalemleri] = useState<SiparisKalemi[]>([])
+
+  // Her ürün için miktar state'i - ürün kodu ve birim kombinasyonu
+  const [urunMiktarlari, setUrunMiktarlari] = useState<Record<string, number>>({})
+
+  const getUrunMiktarKey = (stoKod: string, birim: string) => `${stoKod}-${birim}`
+
+  const getUrunMiktar = (stoKod: string, birim: string) => {
+    return urunMiktarlari[getUrunMiktarKey(stoKod, birim)] || 1
+  }
+
+  const setUrunMiktar = (stoKod: string, birim: string, miktar: number) => {
+    const key = getUrunMiktarKey(stoKod, birim)
+    setUrunMiktarlari(prev => ({
+      ...prev,
+      [key]: Math.max(1, miktar)
+    }))
+  }
+
+  const artirUrunMiktar = (stoKod: string, birim: string) => {
+    const mevcutMiktar = getUrunMiktar(stoKod, birim)
+    setUrunMiktar(stoKod, birim, mevcutMiktar + 1)
+  }
+
+  const azaltUrunMiktar = (stoKod: string, birim: string) => {
+    const mevcutMiktar = getUrunMiktar(stoKod, birim)
+    setUrunMiktar(stoKod, birim, Math.max(1, mevcutMiktar - 1))
+  }
 
   useEffect(() => {
     if (!token) {
@@ -258,33 +290,57 @@ export default function MagazaSiparisiPage() {
     setStep(2)
   }
 
-  const handleUrunEkle = (stok: Stok) => {
-    const existingIndex = siparisKalemleri.findIndex(k => k.stok.sto_kod === stok.sto_kod)
+  const handleUrunEkle = (stok: Stok, birim: 'birim1' | 'birim2' | 'birim3') => {
+    let birimAd = stok.sto_birim1_ad
+    let katsayi = 1
+
+    if (birim === 'birim2') {
+      birimAd = stok.sto_birim2_ad
+      katsayi = stok.sto_birim2_katsayi || 1
+    } else if (birim === 'birim3') {
+      birimAd = stok.sto_birim3_ad
+      katsayi = stok.sto_birim3_katsayi || 1
+    }
+
+    const eklenecekMiktar = getUrunMiktar(stok.sto_kod, birim)
+
+    const existingIndex = siparisKalemleri.findIndex(
+      k => k.stok.sto_kod === stok.sto_kod && k.birim === birim
+    )
 
     if (existingIndex >= 0) {
       const newKalemler = [...siparisKalemleri]
-      newKalemler[existingIndex].miktar += 1
+      newKalemler[existingIndex].miktar += eklenecekMiktar
       setSiparisKalemleri(newKalemler)
     } else {
-      setSiparisKalemleri([...siparisKalemleri, { stok, miktar: 1 }])
+      setSiparisKalemleri([...siparisKalemleri, {
+        stok,
+        miktar: eklenecekMiktar,
+        birim,
+        birimAd,
+        katsayi
+      }])
     }
+
+    // Miktar input'unu sıfırla
+    setUrunMiktar(stok.sto_kod, birim, 1)
 
     toast({
       title: 'Ürün Eklendi',
-      description: `${stok.sto_kod} - ${stok.sto_isim} sepete eklendi`,
+      description: `${eklenecekMiktar} ${birimAd} - ${stok.sto_kod} sepete eklendi`,
     })
   }
 
-  const handleMiktarArtir = (stoKod: string) => {
+  const handleMiktarArtir = (stoKod: string, birim: 'birim1' | 'birim2' | 'birim3') => {
     const newKalemler = siparisKalemleri.map(k =>
-      k.stok.sto_kod === stoKod ? { ...k, miktar: k.miktar + 1 } : k
+      k.stok.sto_kod === stoKod && k.birim === birim ? { ...k, miktar: k.miktar + 1 } : k
     )
     setSiparisKalemleri(newKalemler)
   }
 
-  const handleMiktarAzalt = (stoKod: string) => {
+  const handleMiktarAzalt = (stoKod: string, birim: 'birim1' | 'birim2' | 'birim3') => {
     const newKalemler = siparisKalemleri
-      .map(k => k.stok.sto_kod === stoKod ? { ...k, miktar: k.miktar - 1 } : k)
+      .map(k => k.stok.sto_kod === stoKod && k.birim === birim ? { ...k, miktar: k.miktar - 1 } : k)
       .filter(k => k.miktar > 0)
     setSiparisKalemleri(newKalemler)
   }
@@ -329,12 +385,24 @@ export default function MagazaSiparisiPage() {
           </div>
           <ChevronRight className="h-5 w-5 text-muted-foreground" />
           <div className="flex items-center gap-2">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step === 2 ? 'bg-primary text-primary-foreground' :
+              step > 2 ? 'bg-green-500 text-white' :
+                'bg-muted text-muted-foreground'
               }`}>
-              2
+              {step > 2 ? <Check className="h-6 w-6" /> : '2'}
             </div>
             <span className={`font-medium ${step === 2 ? 'text-primary' : 'text-muted-foreground'}`}>
               Ürün Seçimi
+            </span>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          <div className="flex items-center gap-2">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${step === 3 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+              }`}>
+              3
+            </div>
+            <span className={`font-medium ${step === 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+              Sipariş Onayı
             </span>
           </div>
         </div>
@@ -424,25 +492,36 @@ export default function MagazaSiparisiPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {siparisKalemleri.map((kalem) => (
-                    <div key={kalem.stok.sto_kod} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
+                  {siparisKalemleri.map((kalem, index) => (
+                    <div key={`${kalem.stok.sto_kod}-${kalem.birim}`} className="flex items-center justify-between p-2 bg-muted rounded-md">
                       <div className="flex-1">
                         <div className="font-semibold">{kalem.stok.sto_kod}</div>
                         <div className="text-sm text-muted-foreground">{kalem.stok.sto_isim}</div>
+                        <Badge variant="outline" className="text-xs mt-1">
+                          {kalem.birimAd}
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handleMiktarAzalt(kalem.stok.sto_kod)}>
+                        <Button size="sm" variant="outline" onClick={() => handleMiktarAzalt(kalem.stok.sto_kod, kalem.birim)}>
                           <Minus className="h-3 w-3" />
                         </Button>
                         <span className="w-12 text-center font-bold">{kalem.miktar}</span>
-                        <Button size="sm" variant="outline" onClick={() => handleMiktarArtir(kalem.stok.sto_kod)}>
+                        <Button size="sm" variant="outline" onClick={() => handleMiktarArtir(kalem.stok.sto_kod, kalem.birim)}>
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
                     </div>
                   ))}
                 </div>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={() => setStep(3)}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Sipariş Onayına Geç
+                </Button>
               </CardContent>
             </Card>
           )}
@@ -637,19 +716,248 @@ export default function MagazaSiparisiPage() {
                             </div>
                           )}
                         </div>
-                        <Button
-                          className="w-full"
-                          size="sm"
-                          onClick={() => handleUrunEkle(stok)}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Sepete Ekle
-                        </Button>
+
+                        {/* Birim Butonları */}
+                        <div className="flex flex-col gap-2">
+                          {/* Birim 1 - Her zaman var */}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-7 w-7"
+                                onClick={() => azaltUrunMiktar(stok.sto_kod, 'birim1')}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={getUrunMiktar(stok.sto_kod, 'birim1')}
+                                onChange={(e) => setUrunMiktar(stok.sto_kod, 'birim1', parseInt(e.target.value) || 1)}
+                                className="h-7 text-center w-16"
+                              />
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                className="h-7 w-7"
+                                onClick={() => artirUrunMiktar(stok.sto_kod, 'birim1')}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                            <Button
+                              className="w-full justify-start"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleUrunEkle(stok, 'birim1')}
+                            >
+                              <Plus className="h-3 w-3 mr-2" />
+                              {stok.sto_birim1_ad || 'ADET'}
+                            </Button>
+                          </div>
+
+                          {/* Birim 2 - Varsa göster */}
+                          {stok.sto_birim2_ad && stok.sto_birim2_katsayi > 0 && (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  className="h-7 w-7"
+                                  onClick={() => azaltUrunMiktar(stok.sto_kod, 'birim2')}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={getUrunMiktar(stok.sto_kod, 'birim2')}
+                                  onChange={(e) => setUrunMiktar(stok.sto_kod, 'birim2', parseInt(e.target.value) || 1)}
+                                  className="h-7 text-center w-16"
+                                />
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  className="h-7 w-7"
+                                  onClick={() => artirUrunMiktar(stok.sto_kod, 'birim2')}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <Button
+                                className="w-full justify-start"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleUrunEkle(stok, 'birim2')}
+                              >
+                                <Plus className="h-3 w-3 mr-2" />
+                                {stok.sto_birim2_katsayi}x {stok.sto_birim2_ad}
+                              </Button>
+                            </div>
+                          )}
+
+                          {/* Birim 3 - Varsa göster */}
+                          {stok.sto_birim3_ad && stok.sto_birim3_katsayi > 0 && (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  className="h-7 w-7"
+                                  onClick={() => azaltUrunMiktar(stok.sto_kod, 'birim3')}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={getUrunMiktar(stok.sto_kod, 'birim3')}
+                                  onChange={(e) => setUrunMiktar(stok.sto_kod, 'birim3', parseInt(e.target.value) || 1)}
+                                  className="h-7 text-center w-16"
+                                />
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  className="h-7 w-7"
+                                  onClick={() => artirUrunMiktar(stok.sto_kod, 'birim3')}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <Button
+                                className="w-full justify-start"
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleUrunEkle(stok, 'birim3')}
+                              >
+                                <Plus className="h-3 w-3 mr-2" />
+                                {stok.sto_birim3_katsayi}x {stok.sto_birim3_ad}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Step 3: Sipariş Onayı */}
+      {step === 3 && selectedMagaza && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Check className="h-6 w-6" />
+                Sipariş Onayı
+              </CardTitle>
+              <CardDescription>
+                Sipariş bilgilerinizi kontrol edin ve onaylayın
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Mağaza Bilgisi */}
+              <div className="border rounded-lg p-4 bg-muted/50">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Store className="h-5 w-5" />
+                  Mağaza Bilgileri
+                </h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="text-muted-foreground">Mağaza Adı:</div>
+                  <div className="font-medium">{selectedMagaza.dep_adi}</div>
+                  <div className="text-muted-foreground">Mağaza No:</div>
+                  <div className="font-medium">{selectedMagaza.dep_no}</div>
+                  <div className="text-muted-foreground">Depo Tipi:</div>
+                  <div className="font-medium">
+                    {selectedMagaza.dep_tipi === 1 ? 'Satış Mağazası' :
+                      selectedMagaza.dep_tipi === 2 ? 'Merkez Depo' :
+                        selectedMagaza.dep_tipi === 3 ? 'Şube Deposu' :
+                          `Tip ${selectedMagaza.dep_tipi}`}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sipariş Kalemleri */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Sipariş Kalemleri ({siparisKalemleri.length} Ürün, {toplamUrunSayisi} Adet)
+                </h3>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {siparisKalemleri.map((kalem, index) => (
+                    <div key={`${kalem.stok.sto_kod}-${kalem.birim}`} className="border rounded-md p-3 bg-background">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">{index + 1}</Badge>
+                            <span className="font-semibold">{kalem.stok.sto_kod}</span>
+                          </div>
+                          <div className="text-sm mt-1">{kalem.stok.sto_isim}</div>
+                          <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                            {kalem.stok.ana_grup_isim && (
+                              <span>Ana Grup: {kalem.stok.ana_grup_isim}</span>
+                            )}
+                            {kalem.stok.marka_isim && (
+                              <span>Marka: {kalem.stok.marka_isim}</span>
+                            )}
+                          </div>
+                          <Badge variant="secondary" className="text-xs mt-2">
+                            Birim: {kalem.birimAd}
+                            {kalem.katsayi > 1 && ` (${kalem.katsayi}x)`}
+                          </Badge>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">{kalem.miktar}</div>
+                          <div className="text-xs text-muted-foreground">{kalem.birimAd}</div>
+                          {kalem.katsayi > 1 && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              = {kalem.miktar * kalem.katsayi} {kalem.stok.sto_birim1_ad}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Özet */}
+              <div className="border-2 border-primary rounded-lg p-4 bg-primary/5">
+                <h3 className="font-semibold mb-2">Sipariş Özeti</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-muted-foreground">Toplam Ürün Çeşidi:</div>
+                  <div className="font-bold text-right">{siparisKalemleri.length}</div>
+                  <div className="text-muted-foreground">Toplam Adet:</div>
+                  <div className="font-bold text-right text-primary text-xl">{toplamUrunSayisi}</div>
+                </div>
+              </div>
+
+              {/* Butonlar */}
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Geri Dön
+                </Button>
+                <Button
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  size="lg"
+                  onClick={() => {
+                    toast({
+                      title: '✓ Sipariş Onaylandı!',
+                      description: `${toplamUrunSayisi} adet ürün içeren sipariş oluşturuldu`,
+                    })
+                    // TODO: Sipariş kaydetme işlemi
+                  }}
+                >
+                  <Check className="h-5 w-5 mr-2" />
+                  Siparişi Onayla
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

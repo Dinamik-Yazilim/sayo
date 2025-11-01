@@ -56,8 +56,9 @@ module.exports = function (dbModel) {
       // Notlar
       notes: { type: String, default: '' },
 
-      // Sipariş numarası (MikroERP'ye aktarıldığında)
-      siparisNo: { type: String, default: '', index: true },
+      sipGuid: { type: String, default: '', index: true },
+      sipEvrakSeri: { type: String, default: '', index: true },
+      sipEvrakSira: { type: Number, default: 0, index: true },
     },
     {
       timestamps: true, // createdAt, updatedAt otomatik eklenir
@@ -152,7 +153,14 @@ module.exports = function (dbModel) {
       .populate('updatedBy', 'name email')
   }
 
-  const model = mongoose.model(collectionName, schema)
-  dbModel[collectionName] = model
+  schema.pre('save', (next) => next())
+  schema.pre('remove', (next) => next())
+  schema.pre('remove', true, (next, done) => next())
+  schema.on('init', (model) => { })
+  schema.plugin(mongoosePaginate)
+
+  let model = dbModel.conn.model(collectionName, schema, collectionName)
+
+  model.removeOne = (member, filter) => sendToTrash(dbModel, collectionName, member, filter)
   return model
 }

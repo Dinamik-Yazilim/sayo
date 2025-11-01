@@ -145,6 +145,8 @@ export const getStoklar = (
       s.sto_birim1_ad,
       s.sto_birim2_ad,
       s.sto_birim2_katsayi,
+      s.sto_birim3_ad,
+      s.sto_birim3_katsayi,
       (SELECT TOP 1 bar_kodu FROM BARKOD_TANIMLARI WHERE bar_stokkodu = s.sto_kod AND bar_iptal = 0 ORDER BY bar_master DESC, bar_kodu) as barkod1,
       (SELECT bar_kodu FROM (SELECT bar_kodu, ROW_NUMBER() OVER (ORDER BY bar_master DESC, bar_kodu) as rn FROM BARKOD_TANIMLARI WHERE bar_stokkodu = s.sto_kod AND bar_iptal = 0) t WHERE t.rn = 2) as barkod2,
       (SELECT bar_kodu FROM (SELECT bar_kodu, ROW_NUMBER() OVER (ORDER BY bar_master DESC, bar_kodu) as rn FROM BARKOD_TANIMLARI WHERE bar_stokkodu = s.sto_kod AND bar_iptal = 0) t WHERE t.rn = 3) as barkod3,
